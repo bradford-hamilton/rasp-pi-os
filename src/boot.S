@@ -23,6 +23,9 @@ master:
     ldr    x0, =SCR_VALUE
     msr    scr_el3, x0
 
+    ldr    x0, =SPSR_VALUE
+    msr    spsr_el3, x0
+
     adr     x0, bss_begin
     adr     x1, bss_end
     sub     x1, x1, x0
