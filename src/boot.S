@@ -30,6 +30,8 @@ master:
     msr    elr_el3, x0
 
     eret
+
+el1_entry:
     adr     x0, bss_begin
     adr     x1, bss_end
     sub     x1, x1, x0
