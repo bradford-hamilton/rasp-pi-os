@@ -1,3 +1,4 @@
+#include "arm/sysregs.h"
 #include "mm.h"
 
 .section ".text.boot"
@@ -13,6 +14,9 @@ proc_hang:
     b       proc_hang
 
 master:
+    ldr    x0, =SCTLR_VALUE_MMU_DISABLED
+    msr    sctlr_el1, x0
+
     adr     x0, bss_begin
     adr     x1, bss_end
     sub     x1, x1, x0
