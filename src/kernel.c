@@ -19,7 +19,7 @@ void process(char *array)
 void kernel_main(void)
 {
     uart_init();
-    init_print(0, putc);
+    init_printf(0, putc);
     irq_vector_init();
     timer_init();
     enable_interrupt_controller();
