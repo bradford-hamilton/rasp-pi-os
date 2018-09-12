@@ -1,7 +1,6 @@
 #include "sched.h"
 #include "irq.h"
 #include "printf.h"
-#include "fork.h"
 #include "utils.h"
 #include "mm.h"
 
@@ -20,16 +19,15 @@ void preempt_enable(void)
 	current->preempt_count--;
 }
 
+
 void _schedule(void)
 {
 	preempt_disable();
 	int next,c;
 	struct task_struct * p;
-
 	while (1) {
 		c = -1;
 		next = 0;
-
 		for (int i = 0; i < NR_TASKS; i++){
 			p = task[i];
 			if (p && p->state == TASK_RUNNING && p->counter > c) {
@@ -37,11 +35,9 @@ void _schedule(void)
 				next = i;
 			}
 		}
-
 		if (c) {
 			break;
 		}
-
 		for (int i = 0; i < NR_TASKS; i++) {
 			p = task[i];
 			if (p) {
@@ -49,8 +45,7 @@ void _schedule(void)
 			}
 		}
 	}
-
-	switch_to(task[next], next);
+	switch_to(task[next]);
 	preempt_enable();
 }
 
@@ -61,18 +56,20 @@ void schedule(void)
 }
 
 
-void switch_to(struct task_struct * next, int index) 
+void switch_to(struct task_struct * next) 
 {
 	if (current == next) 
 		return;
 	struct task_struct * prev = current;
 	current = next;
+	set_pgd(next->mm.pgd);
 	cpu_switch_to(prev, next);
 }
 
 void schedule_tail(void) {
 	preempt_enable();
 }
+
 
 void timer_tick()
 {
@@ -88,18 +85,12 @@ void timer_tick()
 
 void exit_process(){
 	preempt_disable();
-
 	for (int i = 0; i < NR_TASKS; i++){
 		if (task[i] == current) {
 			task[i]->state = TASK_ZOMBIE;
 			break;
 		}
 	}
-
-	if (current->stack) {
-		free_page(current->stack);
-	}
-
 	preempt_enable();
 	schedule();
 }
